@@ -691,7 +691,7 @@ static int msm_compr_send_media_format_block(struct snd_compr_stream *cstream,
 		wma_cfg.ch_mask = codec_options->wma.channelmask;
 		wma_cfg.encode_opt = codec_options->wma.encodeopt;
 		ret = q6asm_media_format_block_wma(prtd->audio_client,
-					&wma_cfg);
+					&wma_cfg, stream_id);
 		if (ret < 0)
 			pr_err("%s: CMD Format block failed\n", __func__);
 		break;
@@ -710,7 +710,7 @@ static int msm_compr_send_media_format_block(struct snd_compr_stream *cstream,
 		wma_pro_cfg.adv_encode_opt = codec_options->wma.encodeopt1;
 		wma_pro_cfg.adv_encode_opt2 = codec_options->wma.encodeopt2;
 		ret = q6asm_media_format_block_wmapro(prtd->audio_client,
-				&wma_pro_cfg);
+				&wma_pro_cfg, stream_id);
 		if (ret < 0)
 			pr_err("%s: CMD Format block failed\n", __func__);
 		break;
@@ -1572,7 +1572,7 @@ static int msm_compr_trigger(struct snd_compr_stream *cstream, int cmd)
 			if (prtd->last_buffer) {
 				pr_debug("%s: last buffer drain\n", __func__);
 				rc = msm_compr_drain_buffer(prtd, &flags);
-				if (rc) {
+				if (rc || !atomic_read(&prtd->start)) {
 					spin_unlock_irqrestore(&prtd->lock,
 									flags);
 					break;
@@ -1591,7 +1591,7 @@ static int msm_compr_trigger(struct snd_compr_stream *cstream, int cmd)
 			/* wait for the zero length buffer to be returned */
 			pr_debug("%s: zero length buffer drain\n", __func__);
 			rc = msm_compr_drain_buffer(prtd, &flags);
-			if (rc) {
+			if (rc || !atomic_read(&prtd->start)) {
 				spin_unlock_irqrestore(&prtd->lock, flags);
 				break;
 			}
