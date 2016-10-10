@@ -139,8 +139,18 @@ config CPU_FREQ_DEFAULT_GOV_SMARTMAX
 	bool "smartmax"
 	select CPU_FREQ_GOV_SMARTMAX
 	help
-	  Use the CPUFreq governor 'smartmax' as default
-	
+	  Use the CPUFreq governor 'intel' as default. This allows
+	  you to get a full dynamic cpu frequency capable system by simply
+	  loading your cpufreq low-level hardware driver, using the
+	  'intel' governor for better perfromance and power with Intel
+	  mobile platforms.
+
+config CPU_FREQ_DEFAULT_GOV_SMARTMAX_EPS
+        bool "smartmax_eps"
+        select CPU_FREQ_GOV_SMARTMAX_EPS
+        help
+          Use the CPUFreq governor 'smartmax eps' as default
+
 endchoice
 
 config CPU_FREQ_GOV_PERFORMANCE
@@ -285,6 +295,12 @@ config CPU_FREQ_GOV_PMC
   select CPU_FREQ_TABLE	
   help	
     'smartmax' tweaked for absolute battery
+
+config CPU_FREQ_GOV_SMARTMAX_EPS
+        tristate "'smartmax EPS' cpufreq policy governor"
+        select CPU_FREQ_TABLE
+        help
+          'smartmax EPS' is the extreme powersaving version of smartmax
 
 config CPU_BOOST
 	tristate "Event base short term CPU freq boost"
